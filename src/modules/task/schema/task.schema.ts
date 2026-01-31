@@ -1,32 +1,35 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import mongoose from 'mongoose';
+import { TaskStatusEnum } from '../enum/task-status.enum';
 
 @Schema({ timestamps: true })
-export class User {
+export class Task {
   @Prop({
+    type: mongoose.Types.ObjectId,
     required: true,
-    unique: true,
-    type: String,
+    ref: 'User',
+    index: true,
     trim: true,
   })
-  email: string;
-  @Prop({
-    required: true,
-    type: String,
-    trim: true,
-  })
-  password: string;
+  userId: mongoose.Types.ObjectId;
   @Prop({
     required: true,
     type: String,
     trim: true,
   })
-  name: string;
+  title: string;
   @Prop({
     required: true,
     type: String,
     trim: true,
   })
-  age: number;
+  description: string;
+  @Prop({
+    required: true,
+    type: String,
+    trim: true,
+  })
+  status: TaskStatusEnum;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const TaskSchema = SchemaFactory.createForClass(Task);

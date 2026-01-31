@@ -1,26 +1,40 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
 import { map, Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
-import {Response} from '../interface/response.interface'
+import { Response } from '../interface/response.interface';
+import { Response as ExpressResponse } from 'express';
+
 @Injectable()
 export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
   constructor(private readonly reflector: Reflector) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
-    const response = context.switchToHttp().getResponse();
+  intercept(
+    context: ExecutionContext,
+    next: CallHandler,
+  ): Observable<Response<T>> {
+    const response = context.switchToHttp().getResponse<ExpressResponse>();
 
     return next.handle().pipe(
-      map(data => {
+      map((data: T) => {
         // Check if the status code is not an error
         const statusCode = response.statusCode;
         if (statusCode >= 200 && statusCode < 300) {
           return {
             statusCode: statusCode,
-            message: this.reflector.get<string>("response_message", context.getHandler()) || 'Success',
+            message:
+              this.reflector.get<string>(
+                'response_message',
+                context.getHandler(),
+              ) || 'Success',
             data,
-          };
+          } as Response<T>;
         }
-        return data;
+        return data as Response<T>;
       }),
     );
   }

@@ -8,7 +8,6 @@ export const setupSwagger = (app: INestApplication): void => {
     .setVersion('1.0')
     .addBearerAuth()
     .setContact('Support', '01003428624', 'thomassedhom5@gmail.com')
-    .addServer('/api/v1')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
