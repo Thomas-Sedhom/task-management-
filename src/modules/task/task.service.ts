@@ -88,4 +88,21 @@ export class TaskService {
     const logs = await this.logModel.find({ userId: user_id });
     return logs;
   }
+
+  async rateLimitingLog(
+    userId: string,
+    taskId: string,
+    IP: string,
+    user_agent: string,
+  ){
+    const task_id: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(
+      taskId,
+    );
+    const user_id: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(
+      userId,
+    );
+    const action = ActionEnum.RATE_LIMIT_EXCEEDED;
+    const logDto: LogDto = { IP, user_agent, action };
+    await this.logModel.create({ userId: user_id, taskId: task_id, ...logDto });
+  }
 }

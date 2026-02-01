@@ -5,6 +5,8 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { CustomRequest } from '../interface/custom-request.interface';
+import { JwtService } from '@nestjs/jwt';
+import { TaskService } from '../../modules/task/task.service';
 
 interface RateLimitRecord {
   count: number;
@@ -13,12 +15,14 @@ interface RateLimitRecord {
 
 @Injectable()
 export class RateLimitGuard implements CanActivate {
+  constructor(private readonly taskService: TaskService) {
+  }
   private requests = new Map<string, RateLimitRecord>();
 
   private readonly MAX_REQUESTS = 5;
   private readonly WINDOW_MS = 60 * 1000; // 1 minute
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest<CustomRequest>();
 
     const key = request.user?.sub ?? 'unknown';
@@ -37,6 +41,26 @@ export class RateLimitGuard implements CanActivate {
     }
 
     if (record.count >= this.MAX_REQUESTS) {
+      const ip =
+        request.headers['x-forwarded-for']?.toString() ??
+        request.socket.remoteAddress ??
+        request.ip ??
+        'unknown';
+
+      const userAgent = request.headers['user-agent'] ?? 'unknown';
+
+      const taskIdParam = request.params.taskId;
+
+      if (Array.isArray(taskIdParam)) {
+        throw new BadRequestException('Invalid taskId');
+      }
+
+      await this.taskService.rateLimitingLog(
+        request.user?.sub || 'unknown',
+        taskIdParam,
+        ip,
+        userAgent,
+      );
       throw new BadRequestException(
         'Too many requests, please try again later',
       );

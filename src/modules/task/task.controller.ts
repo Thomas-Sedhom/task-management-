@@ -24,6 +24,7 @@ import { TaskStatusEnum } from './enum/task-status.enum';
 import { JwtGuard } from '../../common/guard/jwt.guard';
 import { JwtRefreshGuard } from '../../common/guard/refresh-jwt.guard';
 import { RateLimitGuard } from '../../common/guard/rate-limiting.guard';
+import { UpdateTaskStatusDto } from './dto/update-task.dto';
 @ApiTags('Task')
 @UseFilters(CustomExceptionFilter)
 @UseInterceptors(ResponseInterceptor)
@@ -60,18 +61,11 @@ export class TaskController {
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 404, description: 'Task not found' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
-  @ApiBody({
-    schema: {
-      properties: {
-        taskStatus: { enum: Object.values(TaskStatusEnum) },
-      },
-    },
-  })
   @ResponseMessage('Task status updated successfully')
   @Patch(':taskId/status')
   async updateTaskStatus(
     @Param('taskId') taskId: string,
-    @Body('taskStatus') taskStatus: TaskStatusEnum,
+    @Body() updateTaskStatusDto: UpdateTaskStatusDto,
     @User() user: UserInterface,
     @Req() req: Request,
   ): Promise<any> {
@@ -90,7 +84,7 @@ export class TaskController {
       taskId,
       ip,
       userAgent,
-      taskStatus,
+      updateTaskStatusDto.taskStatus,
     );
   }
   @ApiOperation({ summary: 'Delete task' })
