@@ -3,6 +3,13 @@ import { UserInterface } from '../auth/interface/user.interface';
 import { JwtService as NestJwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 
+export interface JwtPayload {
+  sub: number;
+  email: string;
+  role: string;
+  iat?: number;
+  exp?: number;
+}
 @Injectable()
 export class JwtService {
   constructor(private readonly jwtService: NestJwtService) {}
@@ -13,10 +20,10 @@ export class JwtService {
   }
   generateRefreshToken(info: UserInterface) {
     const id: string | undefined = info._id?.toString();
-    const payload: object = { sub: id, email: info.email };
+    const payload = { sub: id, email: info.email };
     return this.jwtService.sign(payload, { expiresIn: '60d' });
   }
-  verifyToken(token: string): object {
+  verifyToken(token: string): JwtPayload {
     try {
       return this.jwtService.verify(token);
     } catch {

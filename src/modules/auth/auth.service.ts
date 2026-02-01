@@ -53,4 +53,15 @@ export class AuthService {
       },
     };
   }
+
+  async refreshTokens(refreshToken: string) {
+    const decodedToken = this.jwtService.verifyToken(refreshToken);
+    const user = await this.userModel.findById(decodedToken.sub);
+    if (!user) throw new UnauthorizedException('User not found');
+
+    const newAccessToken = this.jwtService.generateToken(user);
+    const newRefreshToken = this.jwtService.generateRefreshToken(user);
+
+    return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+  }
 }

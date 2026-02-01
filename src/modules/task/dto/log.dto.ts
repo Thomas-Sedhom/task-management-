@@ -11,5 +11,5 @@ export class LogDto {
   @IsString({ message: 'Action must be a string' })
   @IsNotEmpty({ message: 'Action is required' })
   @IsEnum(ActionEnum)
-  status: ActionEnum;
+  action: ActionEnum;
 }
