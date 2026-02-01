@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { setupSwagger } from './config/swagger.config';
 import * as dotenv from 'dotenv';
 import { CustomExceptionFilter } from './common/filter/custom-exception.filter';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
