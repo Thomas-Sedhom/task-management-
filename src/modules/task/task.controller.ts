@@ -23,10 +23,11 @@ import { Request } from 'express';
 import { TaskStatusEnum } from './enum/task-status.enum';
 import { JwtGuard } from '../../common/guard/jwt.guard';
 import { JwtRefreshGuard } from '../../common/guard/refresh-jwt.guard';
+import { RateLimitGuard } from '../../common/guard/rate-limiting.guard';
 @ApiTags('Task')
 @UseFilters(CustomExceptionFilter)
 @UseInterceptors(ResponseInterceptor)
-@UseGuards(JwtGuard, JwtRefreshGuard)
+@UseGuards(JwtGuard, JwtRefreshGuard, RateLimitGuard)
 @Controller('task')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}

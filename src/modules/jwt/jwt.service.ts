@@ -2,14 +2,8 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserInterface } from '../auth/interface/user.interface';
 import { JwtService as NestJwtService } from '@nestjs/jwt';
 import { Response } from 'express';
+import { JwtPayload } from './interface/jwt-payload.interface';
 
-export interface JwtPayload {
-  sub: number;
-  email: string;
-  role: string;
-  iat?: number;
-  exp?: number;
-}
 @Injectable()
 export class JwtService {
   constructor(private readonly jwtService: NestJwtService) {}
